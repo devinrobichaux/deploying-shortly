@@ -76,7 +76,18 @@ function(req, res) {
 // Write your authentication routes here
 /************************************************************/
 
+var public = app.get('views')
 
+
+app.get('/login', function(req, res) {
+  // res.send('hello');
+  res.render(`${public}/login.ejs`)
+});
+
+app.get('/signup', function(req, res) {
+  // res.send('hello');
+  res.render(`${public}/signup.ejs`)
+});
 
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
