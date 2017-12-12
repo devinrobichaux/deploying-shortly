@@ -97,6 +97,20 @@ function(req, res) {
   }).save()
 });
 
+app.post('/login', 
+function(req, res) {
+  db.knex('users')
+    .where('username', '=', req.body.username)
+    .then(function(res) {
+      console.log(res);
+      if (res[0]['password'] === req.body.password) {
+        res.render('index');
+      } else {
+        res.send('invalid password');
+      }
+    });
+});
+
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
 // assume the route is a short code and try and handle it here.
