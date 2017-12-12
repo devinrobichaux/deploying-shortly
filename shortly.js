@@ -94,7 +94,9 @@ function(req, res) {
   new User({
     'username': req.body.username,
     'password': req.body.password
-  }).save()
+  }).save().then(function(newUser) {
+    res.redirect(200, '/');
+  });
 });
 
 app.post('/login', 
@@ -102,7 +104,7 @@ function(req, res) {
   db.knex('users')
     .where('username', '=', req.body.username)
     .then(function(res) {
-      console.log(res);
+
       if (res[0]['password'] === req.body.password) {
         res.render('index');
       } else {
