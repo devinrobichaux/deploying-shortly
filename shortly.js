@@ -89,6 +89,14 @@ app.get('/signup', function(req, res) {
   res.render(`${public}/signup.ejs`)
 });
 
+app.post('/signup', 
+function(req, res) {
+  new User({
+    'username': req.body.username,
+    'password': req.body.password
+  }).save()
+});
+
 /************************************************************/
 // Handle the wildcard route last - if all other routes fail
 // assume the route is a short code and try and handle it here.
