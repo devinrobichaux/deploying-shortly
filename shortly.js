@@ -16,9 +16,7 @@ var app = express();
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 app.use(partials());
-// Parse JSON (uniform resource locators)
 app.use(bodyParser.json());
-// Parse forms (signup/login)
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(__dirname + "/public"));
 
@@ -27,15 +25,12 @@ app.use(
     secret: "denied",
     resave: false,
     saveUninitialized: false,
-    // cookie: {},
     user: undefined 
   })
 );
 
 function restrict(req, res, next) {
-  console.log(req.session.user);
   if (req.session.user) {
-    // res.redirect('/')
     next();
   } else {
     req.session.error = 'please login'
@@ -51,20 +46,17 @@ app.get("/create", restrict, function(req, res) {
   res.render("index");
 });
 
-app.get("/links", function(req, res) {
+app.get("/links", restrict, function(req, res) {
   console.log(req.sessions);
-  // if (req.session.user) {
     Links.reset()
       .fetch()
       .then(function(links) {
         res.status(200).send(links.models);
       });
-  // } else {
-  //   res.redirect("login");
-  // }
+  //
 });
 
-app.post("/links", function(req, res) {
+app.post("/links", restrict, function(req, res) {
   var uri = req.body.url;
 
   if (!util.isValidUrl(uri)) {
@@ -78,7 +70,6 @@ app.post("/links", function(req, res) {
     } else {
       util.getUrlTitle(uri, function(err, title) {
         if (err) {
-          // console.log("Error reading URL heading: ", err);
           return res.sendStatus(404);
         }
 
@@ -101,12 +92,10 @@ app.post("/links", function(req, res) {
 var public = app.get("views");
 
 app.get("/login", function(req, res) {
-  // res.send('hello');
   res.render(`${public}/login.ejs`);
 });
 
 app.get("/signup", function(req, res) {
-  // res.send('hello');
   res.render(`${public}/signup.ejs`);
 });
 
@@ -118,13 +107,8 @@ app.post("/signup", function(req, res) {
     .save()
     .then(function(newUser) {
       req.session.user = true; 
-      // console.log(req.session.user);
-      // req.session.regenerate(function() {
-      //   req.session.user=req.body.username;
         res.redirect(302, "/");
-        // console.log('this is signup', req.session.user);
       });
-    // });
 });
 
 app.post("/login", function(req, res) {
@@ -132,13 +116,12 @@ app.post("/login", function(req, res) {
     .knex("users")
     .where("username", "=", req.body.username)
     .then(function(data) {
-      if (data[0].password === req.body.password) {
-        // res.render('index');
-        // req.session.regenerate(function() {
+      console.log(data, 'this is data')
+      if (data.length === 0) {
+        res.redirect(`/login`)
+      }else if (data[0].password === req.body.password) {
           req.session.user = true;
-          // console.log(req.session);
           res.redirect(302, '/');
-          // console.log(req.session.user, 'this is login cookie');
       } else {
         res.redirect(302, 'login');
       }
