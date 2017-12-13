@@ -1,0 +1,19 @@
+language: node_js
+node_js:
+  - "7"
+dist: trusty # needs Ubuntu Trusty
+sudo: false  # no need for virtualization.
+cache:
+  directories:
+    - node_modules
+test:
+  adapter: sqlite3
+  database: ":memory:"
+  timeout: 5000
+before_script:
+  - "npm install"
+  - "node app/config.js &"
+script:
+  - npm test
+notifications:
+  webhooks: https://greenlight.operationspark.org/api/v2/webhooks/travisci
